@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "r4c"
+version = "0.1.0"
+description = ""
+authors = ["AntiViruS90 <131804906+AntiViruS90@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^5.1.4"
+
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^7.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
