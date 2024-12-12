@@ -5,21 +5,32 @@ from django.utils.dateparse import parse_datetime
 from django.db import DatabaseError
 from .models import Robot
 
+import io
+import datetime
+from django.http import HttpResponse
+from openpyxl import Workbook
+from openpyxl.utils import get_column_letter
+from django.db.models import Count
+
 
 # Create your views here.
 @csrf_exempt
 def create_robot(req):
     """
-        Handle the creation of a new robot entry in the database.
+        Description:
+        ------------
+            Handle the creation of a new robot entry in the database.
 
-        This view function processes POST requests to create a new robot
-        with the specified model, version, and creation date. It expects
-        a JSON payload with the required fields.
+            This view function processes POST requests to create a new robot
+            with the specified model, version, and creation date. It expects
+            a JSON payload with the required fields.
 
         Parameters:
+        -----------
         req (HttpRequest): The HTTP request object containing the POST data.
 
         Returns:
+        --------
         JsonResponse: A JSON response indicating the result of the operation.
                       - On success, returns a 201 status with a message and the robot ID.
                       - On failure, returns an appropriate error message and status code:
@@ -82,3 +93,65 @@ def create_robot(req):
             {'error': "Only POST method is allowed"},
             status=405
         )
+
+
+def generate_robot_summary(req):
+    """
+        Description:
+        ------------
+            Generate an Excel summary of robots created in the last week.
+
+            This function retrieves all robots created in the past week and generates
+            an Excel file summarizing the count of each model and version. The Excel
+            file is then returned as an HTTP response for download.
+
+        Parameters:
+        -----------
+            req (HttpRequest): The HTTP request object.
+
+        Returns:
+        -------
+            HttpResponse:
+            An HTTP response with the Excel file attached, containing the summary of robots created in the last week.
+    """
+    one_week_ago = datetime.datetime.now() - datetime.timedelta(days=7)
+    robots = Robot.objects.filter(created__gte=one_week_ago)
+
+    wb = Workbook()
+    wb.create_sheet(title="Placeholder")
+    wb.remove(wb["Placeholder"])
+
+    models = robots.values('model').distinct()
+
+    for model in models:
+        model_name = model['model']
+        model_robots = robots.filter(model=model_name)
+
+        version_summary = model_robots.values('version').annotate(count=Count('id'))
+        ws = wb.create_sheet(title=model_name)
+
+        ws.append(['Модель', 'Версия', 'Количество за неделю'])
+
+        for entry in version_summary:
+            ws.append([model_name, entry['version'], entry['count']])
+
+        for col in range(1, 4):
+            column = get_column_letter(col)
+            max_length = 0
+
+            for row in ws.iter_rows(min_col=col, max_col=col):
+                for cell in row:
+                    try:
+                        if len(str(cell.value)) > max_length:
+                            max_length = len(cell.value)
+                    except:
+                        pass
+            adjusted_width = (max_length + 2)
+            ws.column_dimensions[column].width = adjusted_width
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=robot_summary_last_week.xlsx'
+
+    wb.save(response)
+
+    return response
