@@ -123,3 +123,23 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.mailtrap.io'  # Пример SMTP сервера
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'your-mailtrap-username'
+# EMAIL_HOST_PASSWORD = 'your-mailtrap-password'
+# DEFAULT_FROM_EMAIL = 'no-reply@company.com'
+
+################# Gmail.com ###################
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_HOST_USER = "slava90nikitin90@gmail.com"
+EMAIL_HOST_PASSWORD = 'qzyd pnia lqbz xdtv'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_SERVER = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_ADMIN = EMAIL_HOST_USER
