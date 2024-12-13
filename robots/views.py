@@ -5,7 +5,6 @@ from django.utils.dateparse import parse_datetime
 from django.db import DatabaseError
 from .models import Robot
 
-import io
 import datetime
 from django.http import HttpResponse
 from openpyxl import Workbook

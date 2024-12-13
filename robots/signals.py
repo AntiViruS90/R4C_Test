@@ -8,6 +8,26 @@ from R4C import settings
 
 @receiver(post_save, sender=Robot)
 def notify_customers_when_robot_available(sender, instance, created, **kwargs):
+    """
+        Sends notification emails to customers when a new robot becomes available
+        and updates the order status.
+
+        This function is triggered after a Robot instance is saved. If the instance
+        is newly created, it checks for any orders waiting for this specific robot
+        and sends an email notification to the customers. It also updates the order
+        status to fulfilled.
+
+        Parameters:
+        ----------
+            sender (Model): The model class that sent the signal.
+            instance (Robot): The actual instance of the Robot that was saved.
+            created (bool): A boolean indicating whether a new record was created.
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+        --------
+            None
+    """
     if created:
         try:
             orders = Order.objects.filter(robot_serial=instance.serial, is_waiting=True)

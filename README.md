@@ -32,3 +32,40 @@ ___
 - Сделать по 1 отдельному PR с решением для каждой задачи
 - Прислать ссылку на своё решение
 
+
+### **Инструкция по загрузке и установки приложения:**
+
+
+| STEP | INSTRUCTION                                                                                    |
+|-----:|------------------------------------------------------------------------------------------------|
+|    1 | _Клонируем репозиторий на ПК:_<br/>```git clone https://github.com/AntiViruS90/R4C_Test.git``` |
+|    2 | _Переходим в репозиторий:_<br/> ```cd R4C_Test```                                              |
+|    2 | _Установка зависимостей:_<br/> ```poetry install --no-root```                                  |
+|    2 | _Создаем базу данных:_<br/> ```python manage.py migrate```                                     |
+|    3 | _Активируем приложение:_ <br/>```python manage.py runserver```                                 |
+
+
+### **API-endpoint добавлению роботов в БД:**
+
+```
+ curl -X POST http://127.0.0.1:8000/robots/create/ \
+ -H "Content-Type: application/json" \
+ -d '{"model": "X5", "version": "LE", "created": "2024-12-11 11:00:01"}'
+```
+
+
+### **Скачивание Excel файла по прямой ссылке за последнюю неделю:**
+
+```http://127.0.0.1:8000/robots/download_robots_summary/```
+
+
+### **Получение Email уведомления:**
+1. ```python manage.py shell```
+2. ```from datetime import datetime```
+3. ```from customers.models import Customer```
+4. ```from orders.models import Order```
+5. ```from robots.models import Robot```
+6. ```customer = Customer.objects.create(email='example_email_here') -> создаём заказчика```
+7. ```order = Order.objects.create(customer=customer, robot_serial='R2D6',is_waiting=True) -> создаём заказ```
+8. ```robot = Robot.objects.create(serial="R2D3", model="R2", version="D3", created=datetime.now()) -> сохраняем рандомную серию робота```
+9. ```robot = Robot.objects.create(serial="R2D6", model="R2", version="D6", created=datetime.now()) -> сохраняем рандомную серию робота, так как серия робота = "R2D6" и у заказчика аналогичный номер, то заказчик получит уведомление на почту, указанную при регистрации пользователя, точнее см. п. 6```
